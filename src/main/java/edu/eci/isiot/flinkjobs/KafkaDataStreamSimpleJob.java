@@ -63,13 +63,16 @@ public class KafkaDataStreamSimpleJob {
         printSink.setRuntimeContext(lowTemperature);
         printSink.invoke(lowTemperature);
          */
-        lowTemperature.print();
+
         SingleOutputStreamOperator<AlertMessage> highMap = highTemperature.map(new MapFunction<Temperature, AlertMessage>() {
             @Override
             public AlertMessage map(Temperature temperature) throws Exception {
                 return new AlertMessage("felipemarcelo156@gmail.com",""+temperature.getDegrees());
             }
         });
+        lowTemperature.addSink(new PrintSinkFunction<>());
+        lowTemperature.print().setParallelism(1);
+        System.out.println(lowTemperature.print());
 
         env.execute();
     }
